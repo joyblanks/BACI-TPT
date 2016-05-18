@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/croster"
+            android:icon="@drawable/ic_cancel_roster"
+            android:title="Cancel Roster" />
+        <item
+            android:id="@+id/uroster"
+            android:icon="@drawable/ic_update_roster"
+            android:title="Update Roster" />
+        <item
+            android:id="@+id/eta"
+            android:icon="@drawable/ic_eta_info"
+            android:title="ETA information" />
+        <item
+            android:id="@+id/req_align"
+            android:icon="@drawable/ic_req_alignment"
+            android:title="Request Pick Alignment" />
+        <item
+            android:id="@+id/reachedsafe"
+            android:icon="@drawable/ic_reached_safe"
+            android:title="Reached Safe" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Locate Transport" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Settings" />
+        </menu>
+    </item>
+
+</menu>
