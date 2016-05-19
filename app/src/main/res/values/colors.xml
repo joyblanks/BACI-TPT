@@ -6,4 +6,7 @@
     <color name="lightseagreen">#20B2AA</color>
     <color name="slateblue">#6A5ACD</color>
     <color name="gainsboro">#DCDCDC</color>
+
+    <color name="mdtp_accent_color">#009688</color>
+    <color name="mdtp_accent_color_dark">#00796b</color>
 </resources>

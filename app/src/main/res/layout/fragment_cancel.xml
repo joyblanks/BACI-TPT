@@ -4,7 +4,6 @@
              android:layout_height="match_parent"
              tools:context="com.blanks.joy.bacitpt.CancelFragment">
 
-
     <Switch
         android:id="@+id/rosterType"
         android:layout_width="wrap_content"
@@ -19,7 +18,55 @@
         android:textOn="Pick"
         android:thumbTextPadding="5dp"
         android:thumb="@drawable/thumb_custom"
-        android:theme="@style/RosterType"
-        />
+        android:theme="@style/RosterType" />
+
+    <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alignmentMode="alignBounds"
+                android:columnCount="2"
+                android:columnOrderPreserved="false"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:useDefaultMargins="true" >
+        <!-- TimePicker options -->
+        <TextView
+            android:id="@+id/time_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/selected_time"
+
+            />
+
+        <Button
+            android:id="@+id/time_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_time"
+           />
+
+        <!-- DatePicker Options -->
+        <TextView
+            android:id="@+id/date_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/selected_date"
+            />
+
+        <Button
+            android:id="@+id/date_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pick_date"
+            />
+
+
+    </GridLayout>
+
+
+
 
 </RelativeLayout>
