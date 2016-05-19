@@ -2,6 +2,8 @@ package com.blanks.joy.bacitpt;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Application;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -29,7 +31,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute, OnMapReadyCallback {
+		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute, OnMapReadyCallback,Application.ActivityLifecycleCallbacks {
 
 	private static final int MY_PERMISSIONS = 123;
 
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity
 
 	String rosterType = "P";
 
-	Activity activity;
+	public static Activity activity;
 
 
 	@Override
@@ -57,10 +59,10 @@ public class MainActivity extends AppCompatActivity
 		setSupportActionBar(toolbar);
 		fragmentManager = getSupportFragmentManager();
 		activity = this;
-		//String rosterType = ((Switch)findViewById(R.id.rosterType)).getstate
 
-
+		//registerActivityLifecycleCallbacks(this);
 		FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+		fab.setVisibility(View.GONE);
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -155,6 +157,7 @@ public class MainActivity extends AppCompatActivity
 		// Handle navigation view item clicks here.
 		int id = item.getItemId();
 		screen = id;
+		((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.VISIBLE);
 		if (id == R.id.croster) {
 			CancelFragment fragment = new CancelFragment();
 			Bundle bundle = new Bundle();
@@ -196,6 +199,7 @@ public class MainActivity extends AppCompatActivity
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
 		}else if(id == R.id.nav_send){
 			ComingSoonFragment fragment = new ComingSoonFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -235,5 +239,42 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onMapReady(GoogleMap map) {
 		map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+	}
+
+	@Override
+	public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+		this.activity = activity;//here we get the activity
+		Intent i = new Intent(this, MessageReceiver.class);
+		sendBroadcast(i);
+	}
+
+	@Override
+	public void onActivityStarted(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivityResumed(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivityPaused(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivityStopped(Activity activity) {
+
+	}
+
+	@Override
+	public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+
+	}
+
+	@Override
+	public void onActivityDestroyed(Activity activity) {
+
 	}
 }

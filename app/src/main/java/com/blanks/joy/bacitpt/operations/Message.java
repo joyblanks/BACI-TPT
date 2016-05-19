@@ -12,12 +12,14 @@ import java.util.Calendar;
  */
 public class Message {
 	public static String getNumber(){
-		return "+919769949082";
+		return "+919769949082";//Joy
+		//return "+919223172361";//BACI SMS Transport
 	}
 
 	public static String getContent(int screen, String type, String time){
 		if(screen == R.id.croster){
 			return "CAN "+type+" "+Message.getTodayDate()+" "+time;
+			//return "ETA P 05/19/2016 1300";
 		}
 		return "";
 	}
