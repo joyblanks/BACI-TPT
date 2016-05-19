@@ -1,0 +1,24 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=10:52:F4:2E:79:8A:26:E8:BC:9E:53:39:B6:41:81:A4:2C:E7:21:6F%3Bcom.blanks.joy.bacitpt
+
+    You can also add your credentials to an existing key, using this line:
+    10:52:F4:2E:79:8A:26:E8:BC:9E:53:39:B6:41:81:A4:2C:E7:21:6F;com.blanks.joy.bacitpt
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    Name: BACI_TPT_GMaps_Key
+    Package Name: com.blanks.joy.bacitpt
+    SHA-1 certificate fingerprint: 10:52:F4:2E:79:8A:26:E8:BC:9E:53:39:B6:41:81:A4:2C:E7:21:6F
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        AIzaSyC8G_0yiVUJDk6Ty8PH1fxDakMLhFVlqRI
+    </string>
+</resources>

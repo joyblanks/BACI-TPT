@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -22,19 +23,21 @@ import android.widget.Switch;
 
 import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
 import com.blanks.joy.bacitpt.operations.Message;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute {
+		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute, OnMapReadyCallback {
 
 	private static final int MY_PERMISSIONS = 123;
 
 	NavigationView navigationView;
 	Toolbar toolbar;
 	int screen = 0;
+	public FragmentManager fragmentManager;
 
-	public String getRosterType() {
-		return rosterType;
-	}
 	@Override
 	public void setRosterType(String rosterType) {
 		this.rosterType = rosterType;
@@ -52,7 +55,7 @@ public class MainActivity extends AppCompatActivity
 		setContentView(R.layout.activity_main);
 		toolbar = (Toolbar) findViewById(R.id.toolbar);
 		setSupportActionBar(toolbar);
-
+		fragmentManager = getSupportFragmentManager();
 		activity = this;
 		//String rosterType = ((Switch)findViewById(R.id.rosterType)).getstate
 
@@ -61,6 +64,15 @@ public class MainActivity extends AppCompatActivity
 		fab.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				if(screen==0){
+					Snackbar.make(view, "Select an operation from left panel", Snackbar.LENGTH_SHORT)
+							.setAction("", null).show();
+					return;
+				}else if(screen != R.id.croster){
+					Snackbar.make(view, "Under Construction", Snackbar.LENGTH_SHORT)
+							.setAction("", null).show();
+					return;
+				}
 				if (ContextCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
 					/*
 					View.OnClickListener myOnClickListener = new View.OnClickListener() {
@@ -153,15 +165,42 @@ public class MainActivity extends AppCompatActivity
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
 		} else if (id == R.id.uroster) {
-
+			ComingSoonFragment fragment = new ComingSoonFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
 		} else if (id == R.id.eta) {
-
+			ComingSoonFragment fragment = new ComingSoonFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
 		} else if (id == R.id.req_align) {
-
+			ComingSoonFragment fragment = new ComingSoonFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
 		} else if (id == R.id.reachedsafe) {
-
-		} else if (id == R.id.nav_share|| id == R.id.nav_send) {
-
+			ComingSoonFragment fragment = new ComingSoonFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
+		} else if (id == R.id.nav_share) {
+			/*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+			mapFragment.getMapAsync(this);
+			SupportMapFragment fragment = new SupportMapFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
+			*/
+			LocationFragment fragment = new LocationFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
+		}else if(id == R.id.nav_send){
+			ComingSoonFragment fragment = new ComingSoonFragment();
+			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+			fragmentTransaction.replace(R.id.container_frame,fragment);
+			fragmentTransaction.commit();
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -191,5 +230,10 @@ public class MainActivity extends AppCompatActivity
 			// other 'case' lines to check for other
 			// permissions this app might request
 		}
+	}
+
+	@Override
+	public void onMapReady(GoogleMap map) {
+		map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 	}
 }
