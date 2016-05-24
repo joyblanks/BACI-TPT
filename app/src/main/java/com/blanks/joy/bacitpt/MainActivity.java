@@ -11,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -25,9 +26,18 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.blanks.joy.bacitpt.fragments.CancelFragment;
+import com.blanks.joy.bacitpt.fragments.ComingSoonFragment;
+import com.blanks.joy.bacitpt.fragments.LocationFragment;
+import com.blanks.joy.bacitpt.fragments.RSafeFragment;
+import com.blanks.joy.bacitpt.fragments.RequestAlignmentFragment;
+import com.blanks.joy.bacitpt.fragments.SettingFragment;
+import com.blanks.joy.bacitpt.fragments.UpdateFragment;
 import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
 import com.blanks.joy.bacitpt.operations.Message;
 import com.blanks.joy.bacitpt.operations.MessageReceiver;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
 		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute,Application.ActivityLifecycleCallbacks {
@@ -279,6 +289,12 @@ public class MainActivity extends AppCompatActivity
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		List<Fragment> fragments = getSupportFragmentManager().getFragments();
+		if (fragments != null) {
+			for (Fragment fragment : fragments) {
+				fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+			}
+		}
 		switch (requestCode) {
 			case MY_PERMISSIONS: {
 				// If request is cancelled, the result arrays are empty.

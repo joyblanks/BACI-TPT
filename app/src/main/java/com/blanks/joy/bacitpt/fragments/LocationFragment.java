@@ -1,4 +1,4 @@
-package com.blanks.joy.bacitpt;
+package com.blanks.joy.bacitpt.fragments;
 
 
 import android.Manifest;
@@ -18,10 +18,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.blanks.joy.bacitpt.R;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -97,12 +99,36 @@ public class LocationFragment extends Fragment implements LocationListener {
 			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
 			// For dropping a marker at a point on the Map
-			mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America"));//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
+			MarkerOptions m = new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America").icon(BitmapDescriptorFactory.fromResource(R.mipmap.baci_marker));
+			mMap.addMarker(m);//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
 			// For zooming automatically to the Dropped PIN Location
 			//mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
 		}
 	}
 
+
+
+	public void OnRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		switch (requestCode) {
+			case MY_PERMISSIONS: {
+				// If request is cancelled, the result arrays are empty.
+				if (grantResults.length > 0
+						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+					setUpMap();
+				} else {
+
+					// permission denied, boo! Disable the
+					// functionality that depends on this permission.
+					super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+				}
+				return;
+			}
+
+			// other 'case' lines to check for other
+			// permissions this app might request
+		}
+	}
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {

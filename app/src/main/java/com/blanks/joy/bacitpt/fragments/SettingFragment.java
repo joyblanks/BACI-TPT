@@ -1,4 +1,4 @@
-package com.blanks.joy.bacitpt;
+package com.blanks.joy.bacitpt.fragments;
 
 
 import android.app.Activity;
@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.blanks.joy.bacitpt.R;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
