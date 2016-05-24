@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="com.blanks.joy.bacitpt.CancelFragment">
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.blanks.joy.bacitpt.CancelFragment">
 
     <Switch
         android:id="@+id/rosterType"
@@ -18,7 +18,7 @@
         android:textOn="Pick"
         android:thumbTextPadding="5dp"
         android:thumb="@drawable/thumb_custom"
-        android:theme="@style/RosterType" />
+        android:theme="@style/RosterType"/>
 
     <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -47,8 +47,7 @@
             android:layout_height="wrap_content"
             android:text="@string/pick_time"
             android:theme="@style/MyTheme"
-
-           />
+            />
 
         <!-- DatePicker Options -->
         <TextView

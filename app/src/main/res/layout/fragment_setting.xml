@@ -2,23 +2,8 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             tools:context="com.blanks.joy.bacitpt.CancelFragment">
+             tools:context="com.blanks.joy.bacitpt.SettingFragment">
 
-    <Switch
-        android:id="@+id/rosterType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="75dp"
-        android:layout_marginRight="15dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:showText="true"
-        android:text="Roster "
-        android:textOff="Drop"
-        android:textOn="Pick"
-        android:thumbTextPadding="5dp"
-        android:thumb="@drawable/thumb_custom"
-        android:theme="@style/RosterType" />
 
     <GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -31,10 +16,19 @@
                 android:padding="5dp"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:useDefaultMargins="true" >
+                android:useDefaultMargins="true"
+        android:id="@+id/grid">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Regular Commute Time"
+            android:layout_columnSpan="2"
+            />
+
         <!-- TimePicker options -->
         <TextView
-            android:id="@+id/time_textview"
+            android:id="@+id/timein_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/selected_time"
@@ -42,34 +36,31 @@
             />
 
         <Button
-            android:id="@+id/time_button"
+            android:id="@+id/timein_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/pick_time"
             android:theme="@style/MyTheme"
+            />
 
-           />
-
-        <!-- DatePicker Options -->
+        <!-- TimePicker options -->
         <TextView
-            android:id="@+id/date_textview"
+            android:id="@+id/timeout_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/selected_date"
+            android:text="@string/selected_time"
+
             />
 
         <Button
-            android:id="@+id/date_button"
+            android:id="@+id/timeout_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/pick_date"
+            android:text="@string/drop_time"
             android:theme="@style/MyTheme"
             />
 
 
     </GridLayout>
-
-
-
 
 </RelativeLayout>

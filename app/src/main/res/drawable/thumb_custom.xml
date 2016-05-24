@@ -9,9 +9,9 @@
             <gradient android:startColor="#6495ED"
                       android:endColor="#4682B4"
                       android:angle="270"/>
-            <corners android:radius="70dp"/>
-            <size android:width="70dp"
-                  android:height="70dp" />
+            <corners android:radius="50dp"/>
+            <size android:width="50dp"
+                  android:height="50dp" />
         </shape>
     </item>
     <item android:state_checked="false">
@@ -24,7 +24,7 @@
             <gradient android:startColor="#3CB371"
                       android:endColor="#2E8B57"
                       android:angle="270"/>
-            <corners android:radius="70dp"/>
+            <corners android:radius="50dp"/>
             <size android:width="50dp"
                   android:height="50dp" />
         </shape>

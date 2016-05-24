@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -21,7 +20,6 @@ import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -29,7 +27,7 @@ import java.util.Date;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CancelFragment extends Fragment implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener{
+public class UpdateFragment extends Fragment implements TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener{
 
 	private FragmentCommute mCallback;
 	String rosterType;
@@ -47,7 +45,7 @@ public class CancelFragment extends Fragment implements TimePickerDialog.OnTimeS
 	private Date date;
 	private String[] timeSlots = new String[2];
 
-	public CancelFragment() {
+	public UpdateFragment() {
 		// Required empty public constructor
 	}
 	@Override
@@ -69,65 +67,39 @@ public class CancelFragment extends Fragment implements TimePickerDialog.OnTimeS
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		// Inflate the layout for this fragment
-		frag = inflater.inflate(R.layout.fragment_cancel, container, false);
+		frag = inflater.inflate(R.layout.fragment_update, container, false);
 		//Bundle activityBundle = getArguments();
 		timeTextView = (TextView)frag.findViewById(R.id.time_textview);
 		dateTextView = (TextView)frag.findViewById(R.id.date_textview);
 		timeButton = (Button)frag.findViewById(R.id.time_button);
 		dateButton = (Button)frag.findViewById(R.id.date_button);
 
-		rosterType = "P";//rosterType==null ? activityBundle.getString("rosterType") : rosterType;
-		((Switch)frag.findViewById(R.id.rosterType)).setChecked("P".equals(rosterType));
+		rosterType = "P";//picks only
+		((Switch)frag.findViewById(R.id.rosterType)).setChecked(true);
+		((Switch)frag.findViewById(R.id.rosterType)).setEnabled(false);
 		mCallback.setRosterType(rosterType);
-
-		if(timeSlots[0] != null && timeSlots[1] != null){
-			time = timeSlots["P".equals(rosterType)?0:1];
-			timeTextView.setText(time);
-			mCallback.setTime(time.replace(":",""));
-		}
-		dateTextView.setText("TODAY");
-		date = new Date();
-		mCallback.setDate(new SimpleDateFormat("MM/dd/yyyy").format(date));
-
-		((Switch)frag.findViewById(R.id.rosterType)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				mCallback.setRosterType(isChecked?"P":"D");
-				if(timeSlots[0] != null && timeSlots[1] != null && ((String)timeTextView.getText()).equalsIgnoreCase(timeSlots[0])
-						|| ((String)timeTextView.getText()).equalsIgnoreCase(timeSlots[1])
-						|| ((String)timeTextView.getText()).equalsIgnoreCase("")){
-					time = timeSlots[isChecked ? 0 : 1];
-					timeTextView.setText(time);
-					mCallback.setTime(time.replace(":",""));
-				}
-				timeButton.setText(isChecked?"Pick Time":"Drop Time");
-				dateButton.setText(isChecked?"Pick Date":"Drop Date");
-			}
-		});
-
 
 		// Show a timepicker when the timeButton is clicked
 		timeButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				String[] timeSplit = time != null ? time.split(":") : null;
-
 				Calendar now = Calendar.getInstance();
 				TimePickerDialog tpd = TimePickerDialog.newInstance(
-						CancelFragment.this,
+						UpdateFragment.this,
 						(timeSplit != null && timeSplit[0] != null ? Integer.parseInt(timeSplit[0]) : now.get(Calendar.HOUR_OF_DAY)),
 						(timeSplit != null && timeSplit[1] != null ? Integer.parseInt(timeSplit[1]) : now.get(Calendar.MINUTE)),
 						true
 				);
-				tpd.setThemeDark(false);
+				//tpd.setThemeDark(true);
 				tpd.vibrate(false);
 				tpd.dismissOnPause(true);
 				tpd.enableSeconds(false);
 				tpd.setTimeInterval(1, 5, 60);
-				tpd.setTitle("Select a time for "+("P".equalsIgnoreCase(rosterType)?"Pick":"Drop"));
+				tpd.setTitle("Select a time for Pick");
 				tpd.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
-					public void onCancel(DialogInterface dialogInterface) {
-						Log.d("TimePicker", "Dialog was cancelled");
+					public void onCancel(DialogInterface dialogInterface) {Log.d("TimePicker", "Dialog was cancelled");
 					}
 				});
 				tpd.show(activity.getFragmentManager(), "Timepickerdialog");
@@ -140,18 +112,18 @@ public class CancelFragment extends Fragment implements TimePickerDialog.OnTimeS
 			public void onClick(View v) {
 				Calendar now = Calendar.getInstance();
 				DatePickerDialog dpd = DatePickerDialog.newInstance(
-						CancelFragment.this,
+						UpdateFragment.this,
 						now.get(Calendar.YEAR),
 						now.get(Calendar.MONTH),
 						now.get(Calendar.DAY_OF_MONTH)
 				);
-				dpd.setThemeDark(false);
+				//dpd.setThemeDark(true);
 				dpd.vibrate(false);
 				dpd.dismissOnPause(true);
 				dpd.showYearPickerFirst(false);
 				//dpd.setAccentColor(Color.parseColor("#9C27B0"));
 				//dpd.setTitle("DatePicker Title");
-				dpd.setTitle("Select a date for "+("P".equalsIgnoreCase(rosterType)?"Pick":"Drop"));
+				dpd.setTitle("Select a date for Pick");
 
 
 				/*Calendar[] dates = new Calendar[13];

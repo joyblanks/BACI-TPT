@@ -6,6 +6,7 @@ import android.app.Application;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -22,34 +23,66 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
 import com.blanks.joy.bacitpt.operations.Message;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.blanks.joy.bacitpt.operations.MessageReceiver;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute, OnMapReadyCallback,Application.ActivityLifecycleCallbacks {
+		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute,Application.ActivityLifecycleCallbacks {
 
 	private static final int MY_PERMISSIONS = 123;
 
-	NavigationView navigationView;
-	Toolbar toolbar;
-	int screen = 0;
+	private NavigationView navigationView;
+	private Toolbar toolbar;
+	public int screen = 0;
 	public FragmentManager fragmentManager;
-
+	private Snackbar snackBarId;
 	@Override
 	public void setRosterType(String rosterType) {
 		this.rosterType = rosterType;
 	}
 
 	String rosterType = "P";
+	String time;
+	String date;
+
+	public void setTime(String time){
+		this.time = time;
+	}
+
+	public void setDate(String date){
+		this.date = date;
+	}
 
 	public static Activity activity;
 
+	private Boolean exit = false;
+	@Override
+	public void onBackPressed() {
+		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+		if (drawer.isDrawerOpen(GravityCompat.START)) {
+			drawer.closeDrawer(GravityCompat.START);
+		} else {
+			//super.onBackPressed();
+		}
+		if (exit) {
+			finish(); // finish activity
+		} else {
+			Toast.makeText(this, "Press Back again to Exit.",
+					Toast.LENGTH_SHORT).show();
+			exit = true;
+			new Handler().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					exit = false;
+				}
+			}, 3 * 1000);
 
+		}
+
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,14 +100,44 @@ public class MainActivity extends AppCompatActivity
 			@Override
 			public void onClick(View view) {
 				if(screen==0){
-					Snackbar.make(view, "Select an operation from left panel", Snackbar.LENGTH_SHORT)
-							.setAction("", null).show();
+					snackBarId = Snackbar.make(view, "Select an operation from left panel", Snackbar.LENGTH_SHORT);
+					snackBarId.setAction("", null).show();
 					return;
-				}else if(screen != R.id.croster){
-					Snackbar.make(view, "Under Construction", Snackbar.LENGTH_SHORT)
-							.setAction("", null).show();
+				}else if(screen == R.id.nav_share || screen == R.id.nav_send){
+					if(snackBarId != null){
+						snackBarId.dismiss();
+					}
 					return;
+				}else if(!(screen == R.id.croster || screen == R.id.uroster || screen == R.id.reachedsafe || screen == R.id.req_align)){
+					snackBarId = Snackbar.make(view, "Under Construction", Snackbar.LENGTH_SHORT);
+					snackBarId.setAction("", null).show();
+					return;
+				}else if(screen == R.id.croster){
+					if(time == null || date == null){
+						snackBarId = Snackbar.make(view, "Select Date and Time for this action", Snackbar.LENGTH_SHORT);
+						snackBarId.setAction("", null).show();
+						return;
+					}
+				}else if(screen == R.id.uroster){
+					if(time == null || date == null){
+						snackBarId = Snackbar.make(view, "Select Date and Time for this action", Snackbar.LENGTH_SHORT);
+						snackBarId.setAction("", null).show();
+						return;
+					}
+				}else if(screen == R.id.reachedsafe){
+					if(time == null || date == null){
+						snackBarId = Snackbar.make(view, "Select Date and Time for this action", Snackbar.LENGTH_SHORT);
+						snackBarId.setAction("", null).show();
+						return;
+					}
+				}else if(screen == R.id.req_align){
+					if(time == null || date == null){
+						snackBarId = Snackbar.make(view, "Select Date and Time for this action", Snackbar.LENGTH_SHORT);
+						snackBarId.setAction("", null).show();
+						return;
+					}
 				}
+
 				if (ContextCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
 					/*
 					View.OnClickListener myOnClickListener = new View.OnClickListener() {
@@ -94,9 +157,10 @@ public class MainActivity extends AppCompatActivity
 					ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS);
 				}else{
 
-					Message.sendMessage(screen,rosterType);
+					Message.sendMessage(screen,rosterType, time, date);
 					View parentLayout = findViewById(R.id.container_frame);
-					Snackbar.make(parentLayout, Message.getMessage(screen, rosterType), Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+					snackBarId = Snackbar.make(parentLayout, Message.getMessage(screen, rosterType), Snackbar.LENGTH_INDEFINITE);
+					snackBarId.setAction("Action", null).show();
 				}
 			}
 		});
@@ -119,15 +183,7 @@ public class MainActivity extends AppCompatActivity
 	}
 
 
-	@Override
-	public void onBackPressed() {
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		if (drawer.isDrawerOpen(GravityCompat.START)) {
-			drawer.closeDrawer(GravityCompat.START);
-		} else {
-			super.onBackPressed();
-		}
-	}
+
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -157,54 +213,63 @@ public class MainActivity extends AppCompatActivity
 		// Handle navigation view item clicks here.
 		int id = item.getItemId();
 		screen = id;
+		date = null;
+		time = null;
+		if(snackBarId != null){
+			snackBarId.dismiss();
+		}
+
 		((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.VISIBLE);
 		if (id == R.id.croster) {
 			CancelFragment fragment = new CancelFragment();
-			Bundle bundle = new Bundle();
+			/*Bundle bundle = new Bundle();
 			bundle.putString("rosterType",rosterType);
 			fragment.setArguments(bundle);
+			*/
 			fragment.setRetainInstance(true);
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("Cancel Roster");
 		} else if (id == R.id.uroster) {
-			ComingSoonFragment fragment = new ComingSoonFragment();
+			UpdateFragment fragment = new UpdateFragment();
+			fragment.setRetainInstance(true);
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("Update Roster");
 		} else if (id == R.id.eta) {
 			ComingSoonFragment fragment = new ComingSoonFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("ETA Information");
 		} else if (id == R.id.req_align) {
-			ComingSoonFragment fragment = new ComingSoonFragment();
+			RequestAlignmentFragment fragment = new RequestAlignmentFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("Request Pick Alignment");
 		} else if (id == R.id.reachedsafe) {
-			ComingSoonFragment fragment = new ComingSoonFragment();
+			RSafeFragment fragment = new RSafeFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("Reached Safe?");
 		} else if (id == R.id.nav_share) {
-			/*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-			mapFragment.getMapAsync(this);
-			SupportMapFragment fragment = new SupportMapFragment();
-			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-			fragmentTransaction.replace(R.id.container_frame,fragment);
-			fragmentTransaction.commit();
-			*/
 			LocationFragment fragment = new LocationFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
 			((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
+			activity.setTitle("Locate Transport");
 		}else if(id == R.id.nav_send){
-			ComingSoonFragment fragment = new ComingSoonFragment();
+			((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
+			SettingFragment fragment = new SettingFragment();
 			FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
+			activity.setTitle("Settings");
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -217,11 +282,13 @@ public class MainActivity extends AppCompatActivity
 		switch (requestCode) {
 			case MY_PERMISSIONS: {
 				// If request is cancelled, the result arrays are empty.
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+				if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 					View parentLayout = findViewById(R.id.container_frame);
-					Message.sendMessage(screen, rosterType);
-					Snackbar.make(parentLayout, Message.getMessage(screen, rosterType), Snackbar.LENGTH_INDEFINITE).setAction("Action", null).show();
+					if(time !=null && date!=null) {
+						Message.sendMessage(screen, rosterType, time, date);
+						snackBarId = Snackbar.make(parentLayout, Message.getMessage(screen, rosterType), Snackbar.LENGTH_INDEFINITE);
+						snackBarId.setAction("Action", null).show();
+					}
 
 				} else {
 
@@ -234,11 +301,6 @@ public class MainActivity extends AppCompatActivity
 			// other 'case' lines to check for other
 			// permissions this app might request
 		}
-	}
-
-	@Override
-	public void onMapReady(GoogleMap map) {
-		map.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 	}
 
 	@Override

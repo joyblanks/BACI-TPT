@@ -5,4 +5,6 @@ package com.blanks.joy.bacitpt.interfaces;
  */
 public interface FragmentCommute {
 	public void setRosterType(String r) ;
+	public void setTime(String r) ;
+	public void setDate(String r) ;
 }

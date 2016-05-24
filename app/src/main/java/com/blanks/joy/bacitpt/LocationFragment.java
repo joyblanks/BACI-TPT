@@ -42,6 +42,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	private FragmentActivity myContext;
 	private Activity activity;
+	private LayoutInflater linf;
 
 	public LocationFragment() {
 		// Required empty public constructor
@@ -61,6 +62,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 		if (container == null) {
 			return null;
 		}
+		linf = inflater;
 		view = (RelativeLayout) inflater.inflate(R.layout.fragment_location, container, false);
 		// Passing harcoded values for latitude & longitude. Please change as per your need. This is just used to drop a Marker on the Map
 		latitude = 19.171622;
@@ -81,23 +83,24 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	private void setUpMap() {
 		// For showing a move to my loction button
-		if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-				|| ContextCompat.checkSelfPermission(activity,Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS);
+		if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+				|| ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
+			ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS);
+		}else if(mMap != null){
+			mMap.setMyLocationEnabled(true);
+			mMap.getUiSettings().setAllGesturesEnabled(true);
+			mMap.getUiSettings().setCompassEnabled(true);
+
+			mMap.getUiSettings().setMyLocationButtonEnabled(true);
+			mMap.getUiSettings().setTiltGesturesEnabled(true);
+
+			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+			// For dropping a marker at a point on the Map
+			mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America"));//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
+			// For zooming automatically to the Dropped PIN Location
+			//mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
 		}
-		mMap.setMyLocationEnabled(true);
-		mMap.getUiSettings().setAllGesturesEnabled(true);
-		mMap.getUiSettings().setCompassEnabled(true);
-
-		mMap.getUiSettings().setMyLocationButtonEnabled(true);
-		mMap.getUiSettings().setTiltGesturesEnabled(true);
-
-		locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-		locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
-		// For dropping a marker at a point on the Map
-		mMap.addMarker(new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America"));//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
-		// For zooming automatically to the Dropped PIN Location
-		//mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
 	}
 
 
@@ -114,6 +117,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 					// permission denied, boo! Disable the
 					// functionality that depends on this permission.
+					super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 				}
 				return;
 			}
@@ -125,14 +129,16 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-		CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12.0f);
-		mMap.animateCamera(cameraUpdate);
-		if (ContextCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-				|| ContextCompat.checkSelfPermission(activity,Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS);
+		if(mMap!=null) {
+			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12.0f);
+			mMap.animateCamera(cameraUpdate);
+			if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+					|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS);
+			} else
+				locationManager.removeUpdates(this);
 		}
-		locationManager.removeUpdates(this);
 	}
 
 	@Override
