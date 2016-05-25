@@ -32,16 +32,29 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <activity
+            android:name="com.blanks.joy.bacitpt.logon.SignInActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/ThemeOverlay.MyNoTitleActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
+            <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter>-->
         </activity>
         <receiver android:name=".operations.MessageReceiver" android:exported="true">
         <intent-filter android:priority="999">
@@ -63,3 +76,10 @@
     </application>
 
 </manifest>
+
+<!--
+ +    Name: BACI_TPT_GMaps_Key
+ +    Package Name: com.blanks.joy.bacitpt
+ +    SHA-1 certificate fingerprint: 10:52:F4:2E:79:8A:26:E8:BC:9E:53:39:B6:41:81:A4:2C:E7:21:6F
+
+-->

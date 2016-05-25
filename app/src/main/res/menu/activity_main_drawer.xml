@@ -36,5 +36,8 @@
                 android:title="Settings" />
         </menu>
     </item>
-
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/mr_ic_media_route_mono_light"
+        android:title="Disconnect" />
 </menu>

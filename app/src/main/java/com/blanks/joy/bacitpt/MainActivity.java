@@ -34,13 +34,20 @@ import com.blanks.joy.bacitpt.fragments.RequestAlignmentFragment;
 import com.blanks.joy.bacitpt.fragments.SettingFragment;
 import com.blanks.joy.bacitpt.fragments.UpdateFragment;
 import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
+import com.blanks.joy.bacitpt.logon.SignInActivity;
 import com.blanks.joy.bacitpt.operations.Message;
 import com.blanks.joy.bacitpt.operations.MessageReceiver;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
-		implements NavigationView.OnNavigationItemSelectedListener,FragmentCommute,Application.ActivityLifecycleCallbacks {
+		implements
+		NavigationView.OnNavigationItemSelectedListener
+		,FragmentCommute
+		,GoogleApiClient.OnConnectionFailedListener
+		,Application.ActivityLifecycleCallbacks {
 
 	private static final int MY_PERMISSIONS = 123;
 
@@ -182,6 +189,12 @@ public class MainActivity extends AppCompatActivity
 
 		navigationView = (NavigationView) findViewById(R.id.nav_view);
 		navigationView.setNavigationItemSelectedListener(this);
+
+		((FloatingActionButton) findViewById(R.id.fab)).setVisibility(View.GONE);
+		SettingFragment fragment = new SettingFragment();
+		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+		fragmentTransaction.replace(R.id.container_frame,fragment);
+		fragmentTransaction.commit();
 	}
 
 	public void setRosterType(View view) {
@@ -280,6 +293,10 @@ public class MainActivity extends AppCompatActivity
 			fragmentTransaction.replace(R.id.container_frame,fragment);
 			fragmentTransaction.commit();
 			activity.setTitle("Settings");
+		}else if(id == R.id.logout){
+			Intent iLogout = new Intent(MainActivity.this, SignInActivity.class);
+			iLogout.putExtra("status",false);
+			startActivity(iLogout);
 		}
 
 		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -354,5 +371,10 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onActivityDestroyed(Activity activity) {
 
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
+		//super.onConnectionFailed(connectionResult);
 	}
 }

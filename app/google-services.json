@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "742562920617",
+    "project_id": "default-demo-app-f3690"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742562920617:android:ccdf4ac4d14dea87",
+        "android_client_info": {
+          "package_name": "com.blanks.joy.bacitpt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "742562920617-531f6ptqr8f5hfqtkme0mueja094frte.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.blanks.joy.bacitpt",
+            "certificate_hash": "1052F42E798A26E8BC9E5339B64181A42CE7216F"
+          }
+        },
+        {
+          "client_id": "742562920617-cj98faoab5ttkc05dt6spa8dbtlgaon4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAAt7uPdrkFP9fw1T_A2pK08qF5G-PC7b4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
