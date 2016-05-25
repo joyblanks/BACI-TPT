@@ -1,7 +1,9 @@
 package com.blanks.joy.bacitpt.logon;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -138,6 +140,19 @@ public class SignInActivity extends AppCompatActivity implements
 	        Intent intent = new Intent(this, MainActivity.class);
 	        intent.putExtra("displayName", acct.getDisplayName());
 	        intent.putExtra("photoUrl", acct.getPhotoUrl());
+	        intent.putExtra("id", acct.getId());
+	        intent.putExtra("tokenId", acct.getIdToken());
+	        intent.putExtra("email", acct.getEmail());
+
+	        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+	        SharedPreferences.Editor editor = sharedPref.edit();
+
+	        editor.putString("displayName", acct.getDisplayName());
+	        editor.putString("photoUrl", acct.getPhotoUrl().toString());
+	        editor.putString("id", acct.getId());
+	        editor.putString("tokenId", acct.getIdToken());
+	        editor.putString("email", acct.getEmail());
+	        editor.commit();
 	        startActivity(intent);
         } else {
             // Signed out, show unauthenticated UI.

@@ -3,8 +3,11 @@ package com.blanks.joy.bacitpt;
 import android.Manifest;
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -26,6 +29,8 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 import com.blanks.joy.bacitpt.fragments.CancelFragment;
 import com.blanks.joy.bacitpt.fragments.ComingSoonFragment;
 import com.blanks.joy.bacitpt.fragments.LocationFragment;
@@ -39,8 +44,11 @@ import com.blanks.joy.bacitpt.operations.Message;
 import com.blanks.joy.bacitpt.operations.MessageReceiver;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.koushikdutta.ion.Ion;
 
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivity extends AppCompatActivity
 		implements
@@ -195,6 +203,34 @@ public class MainActivity extends AppCompatActivity
 		FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 		fragmentTransaction.replace(R.id.container_frame,fragment);
 		fragmentTransaction.commit();
+
+		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+		/*
+		TODO Find a better way
+		String url = Constants.URL_PREFIX+"/profile/"+sharedPref.getString("photoUrl","pic")+"/"+sharedPref.getString("id","")+"";
+
+		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+
+			}
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+
+			}
+		});
+		queue.add(jsObjRequest);
+		*/
+
+		try{
+			CircleImageView civ = ((CircleImageView)findViewById(R.id.userView));
+			civ.setVisibility(View.VISIBLE);
+			civ.setImageDrawable(new BitmapDrawable(Ion.with((Context)activity).load(sharedPref.getString("photoUrl","")).asBitmap().get()));
+		}catch (Exception e){
+
+		}
 	}
 
 	public void setRosterType(View view) {

@@ -22,7 +22,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set Regular Commute Time"
+            android:text="Application Settings"
             android:layout_columnSpan="2"
             />
 
@@ -32,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/selected_time"
-
+            android:hint="Regular Pick"
             />
 
         <Button
@@ -49,7 +49,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/selected_time"
-
+            android:hint="Regular Drop"
             />
 
         <Button
@@ -59,7 +59,18 @@
             android:text="@string/drop_time"
             android:theme="@style/MyTheme"
             />
-
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/nbkid"
+            android:width="100sp"
+            android:hint="NBK-ID"
+            />
+        <Button
+            android:id="@+id/savenbk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:theme="@style/MyTheme"
+            />
 
     </GridLayout>
 

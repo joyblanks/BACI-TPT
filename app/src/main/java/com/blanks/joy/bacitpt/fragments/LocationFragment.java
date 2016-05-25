@@ -4,7 +4,9 @@ package com.blanks.joy.bacitpt.fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -13,12 +15,20 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.blanks.joy.bacitpt.R;
+import com.blanks.joy.bacitpt.utils.Constants;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -26,6 +36,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 ;
 
@@ -42,9 +55,11 @@ public class LocationFragment extends Fragment implements LocationListener {
 	private static final float MIN_DISTANCE = 1000;
 	private static View view;
 
+
 	private FragmentActivity myContext;
 	private Activity activity;
 	private LayoutInflater linf;
+	private RequestQueue queue;
 
 	public LocationFragment() {
 		// Required empty public constructor
@@ -55,7 +70,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 		myContext=(FragmentActivity) context;
 		activity = (Activity)context;
 		super.onAttach(context);
-
+		queue = Volley.newRequestQueue(context);
 	}
 
 
@@ -64,6 +79,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 		if (container == null) {
 			return null;
 		}
+		mMap = null;
 		linf = inflater;
 		view = (RelativeLayout) inflater.inflate(R.layout.fragment_location, container, false);
 		// Passing harcoded values for latitude & longitude. Please change as per your need. This is just used to drop a Marker on the Map
@@ -157,6 +173,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 	public void onLocationChanged(Location location) {
 		if(mMap!=null) {
 			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+			broadcastLocation(location);
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12.0f);
 			mMap.animateCamera(cameraUpdate);
 			if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -165,20 +182,100 @@ public class LocationFragment extends Fragment implements LocationListener {
 			} else
 				locationManager.removeUpdates(this);
 		}
-	}
 
-	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {
+			callAPI();
 
 	}
 
 	@Override
-	public void onProviderEnabled(String provider) {
+	public void onStatusChanged(String provider, int status, Bundle extras) {}
 
+	@Override
+	public void onProviderEnabled(String provider) {}
+
+	@Override
+	public void onProviderDisabled(String provider) {}
+
+	private void broadcastLocation(Location location) {
+		SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		if((null == sharedPref.getString("nbkid",null) || null == sharedPref.getString("timeIn",null))){
+			return;
+		}
+		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("nbkid",null)+"/"+location.getLatitude()+","+location.getLongitude()+"/"+sharedPref.getString("timeIn",null).replace(":","")+"";
+		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				// TODO Auto-generated method stub
+				//response.toString();
+			}
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// TODO Auto-generated method stub
+			}
+		});
+		queue.add(jsObjRequest);
 	}
 
 	@Override
-	public void onProviderDisabled(String provider) {
+	public void onResume() {
+		setUpMap();
+		super.onResume();
+	}
+
+
+	private void populateTravellers(JSONObject json){
+
+		JSONArray recs;
+		JSONObject user;
+		Bitmap bmp;
+		MarkerOptions m;
+
+
+		if (mMap != null) {
+			try {
+				recs = json.getJSONArray("records");
+				for (int i = 0; i < recs.length(); i++) {
+					user = recs.getJSONObject(i);
+					m = new MarkerOptions()
+							.position(new LatLng(user.getDouble("lat"), user.getDouble("lon")))
+							.title(user.getString("firstname") + " " + user.getString("lastname"));
+					if (null != user.getString("pic") && !"".equalsIgnoreCase(user.getString("pic"))) {
+						//bmp  = Ion.with((Context)activity).load(user.getString("pic")).asBitmap().get();
+
+						//m.icon(BitmapDescriptorFactory.fromBitmap(bmp));
+					}
+					mMap.addMarker(m);
+				}
+
+			} catch (Exception e) {
+				Log.e("bacitpt", e.getMessage());
+			}
+		}
 
 	}
+
+	private void callAPI(){
+		SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
+		if((null == sharedPref.getString("nbkid",null) || null == sharedPref.getString("timeIn",null))){
+			return;
+		}
+		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("timeIn",null).replace(":","")+"/routeId";
+		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+			@Override
+			public void onResponse(JSONObject response) {
+				// TODO Auto-generated method stub
+				populateTravellers(response);//.toString();
+			}
+		}, new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				// TODO Auto-generated method stub
+			}
+		});
+		queue.add(jsObjRequest);
+	}
+
+
+
 }
