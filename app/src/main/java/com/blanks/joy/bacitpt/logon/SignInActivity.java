@@ -153,7 +153,7 @@ public class SignInActivity extends AppCompatActivity implements
 	        if(toLogIn){
 		        final Intent intent = new Intent(this, MainActivity.class);
 
-		        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		        SharedPreferences sharedPref = getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 		        SharedPreferences.Editor editor = sharedPref.edit();
 
 		        editor.putString("name", acct.getDisplayName());

@@ -27,8 +27,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blanks.joy.bacitpt.fragments.CancelFragment;
@@ -42,12 +42,14 @@ import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
 import com.blanks.joy.bacitpt.logon.SignInActivity;
 import com.blanks.joy.bacitpt.operations.Message;
 import com.blanks.joy.bacitpt.operations.MessageReceiver;
+import com.blanks.joy.bacitpt.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.koushikdutta.ion.Ion;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 
 
 public class MainActivity extends AppCompatActivity
@@ -189,12 +191,14 @@ public class MainActivity extends AppCompatActivity
 		fragmentTransaction.replace(R.id.container_frame,fragment);
 		fragmentTransaction.commit();
 
-		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences sharedPref = getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 
 		try{
-			ImageView civ = ((ImageView)navigationView.findViewById(R.id.userView));
+			CircleImageView civ = ((CircleImageView)navigationView.getHeaderView(0).findViewById(R.id.userView));
 			civ.setVisibility(View.VISIBLE);
 			civ.setImageDrawable(new BitmapDrawable(Ion.with((Context)activity).load(sharedPref.getString("pic","")).asBitmap().get()));
+			TextView t = ((TextView) navigationView.getHeaderView(0).findViewById(R.id.userTxt));
+			t.setText("BACI Transport - "+sharedPref.getString("name",""));
 		}catch (Exception e){
 			Log.e("bacitpt","some shit happened with your display pic");
 		}
@@ -332,11 +336,13 @@ public class MainActivity extends AppCompatActivity
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
 		//super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		List<Fragment> fragments = getSupportFragmentManager().getFragments();
-		if (fragments != null) {
-			for (Fragment fragment : fragments) {
-				if(fragment!=null && fragment instanceof LocationFragment)
-					((LocationFragment)fragment).OnRequestPermissionsResultL(requestCode, permissions, grantResults);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			List<Fragment> fragments = getSupportFragmentManager().getFragments();
+			if (fragments != null) {
+				for (Fragment fragment : fragments) {
+					if (fragment != null && fragment instanceof LocationFragment)
+						((LocationFragment) fragment).OnRequestPermissionsResultL(requestCode, permissions, grantResults);
+				}
 			}
 		}
 		switch (requestCode) {

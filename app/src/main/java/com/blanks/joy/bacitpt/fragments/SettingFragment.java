@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.blanks.joy.bacitpt.R;
+import com.blanks.joy.bacitpt.utils.Constants;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -53,30 +54,13 @@ public class SettingFragment extends Fragment{
 
 		timeInTextView = (TextView)frag.findViewById(R.id.timein_textview);
 		timeOutTextView = (TextView)frag.findViewById(R.id.timeout_textview);
-		nbk = (TextInputEditText)frag.findViewById(R.id.nbkid);
 		Button timeInButton = (Button)frag.findViewById(R.id.timein_button);
 		Button timeOutButton = (Button)frag.findViewById(R.id.timeout_button);
-		Button saveButton = (Button)frag.findViewById(R.id.savenbk);
+
 
 		SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 		timeInTextView.setText(sharedPref.getString("timeIn", null));
 		timeOutTextView.setText(sharedPref.getString("timeOut", null));
-		nbk.setText(sharedPref.getString("nbkid","").toUpperCase());
-		if(nbk.getText()==null){
-			saveButton.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					nbk = (TextInputEditText)frag.findViewById(R.id.nbkid);
-					SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-					SharedPreferences.Editor editor = sharedPref.edit();
-					editor.putString("nbkid", nbk.getText().toString().toUpperCase());
-					editor.commit();
-				}
-			});
-		}else{
-			nbk.setEnabled(false);
-			saveButton.setEnabled(false);
-		}
 
 		
 		// Show a timepicker when the timeButton is clicked
@@ -162,7 +146,7 @@ public class SettingFragment extends Fragment{
 			//String secondString = second < 10 ? "0"+second : ""+second;
 			String time = ""+hourString+":"+minuteString+"";
 			timeInTextView.setText(time);
-			SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			SharedPreferences sharedPref = getActivity().getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPref.edit();
 			editor.putString("timeIn", time);
 			editor.commit();
@@ -177,7 +161,7 @@ public class SettingFragment extends Fragment{
 			//String secondString = second < 10 ? "0"+second : ""+second;
 			String time = ""+hourString+":"+minuteString+"";
 			timeOutTextView.setText(time);
-			SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+			SharedPreferences sharedPref = getActivity().getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 			SharedPreferences.Editor editor = sharedPref.edit();
 			editor.putString("timeOut", time);
 			editor.commit();

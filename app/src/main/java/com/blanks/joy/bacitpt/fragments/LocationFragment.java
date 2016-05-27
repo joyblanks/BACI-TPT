@@ -8,6 +8,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -38,10 +47,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.koushikdutta.ion.Ion;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
+import java.util.HashMap;
 
 ;
 
@@ -63,6 +76,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 	private Activity activity;
 	private LayoutInflater linf;
 	private RequestQueue queue;
+	private HashMap<String, Marker> markers = new HashMap<String, Marker>();
 
 	public LocationFragment() {
 		// Required empty public constructor
@@ -230,11 +244,11 @@ public class LocationFragment extends Fragment implements LocationListener {
 	public void onProviderDisabled(String provider) {}
 
 	private void broadcastLocation(Location location) {
-		SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-		if((null == sharedPref.getString("nbkid",null) || null == sharedPref.getString("timeIn",null))){
+		SharedPreferences sharedPref = activity.getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
+		if((null == sharedPref.getString("id",null) || null == sharedPref.getString("timeIn",null))){
 			return;
 		}
-		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("nbkid",null)+"/"+location.getLatitude()+","+location.getLongitude()+"/"+sharedPref.getString("timeIn",null).replace(":","")+"";
+		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("id",null)+"/"+location.getLatitude()+","+location.getLongitude()+"/"+sharedPref.getString("timeIn",null).replace(":","")+"";
 		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {}
@@ -251,6 +265,39 @@ public class LocationFragment extends Fragment implements LocationListener {
 		super.onResume();
 	}
 
+	private Bitmap getCircleBitmap(Bitmap bitmap) {
+		final Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(output);
+
+		final int color = Color.GREEN;
+		final Paint paint = new Paint();
+		final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+		final Rect rect2= new Rect(bitmap.getWidth()/3, bitmap.getWidth()/3, bitmap.getWidth()*3/4, bitmap.getHeight()*3/4);
+
+		paint.setAntiAlias(true);
+		canvas.drawARGB(0, 0, 0, 0);
+		paint.setColor(color);
+		canvas.drawOval(new RectF(rect2), paint);
+		paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+		canvas.drawBitmap(bitmap, rect, rect2, paint);
+		bitmap.recycle();
+		return output;
+		//return Bitmap.createScaledBitmap(output, 200, 200, false);
+	}
+
+	public Bitmap mergeToPin(Bitmap front) {
+		front = getCircleBitmap(front);
+		Bitmap back = BitmapFactory.decodeResource(activity.getResources(),R.mipmap.map_mark_bkg_cyan);
+		Bitmap result = Bitmap.createBitmap(200, 200, back.getConfig());
+		Canvas canvas = new Canvas(result);
+		canvas.drawBitmap(back,new Matrix(), null);
+		Matrix matrix = new Matrix();
+		matrix.postScale(0.4f, 0.4f);
+		matrix.postTranslate(7,-20);
+		canvas.drawBitmap(front, matrix, null);
+		//return result;
+		return Bitmap.createScaledBitmap(result, 300, 300, false);
+	}
 
 	private void populateTravellers(JSONObject json){
 
@@ -258,22 +305,28 @@ public class LocationFragment extends Fragment implements LocationListener {
 		JSONObject user;
 		Bitmap bmp;
 		MarkerOptions m;
-
+		String id;
 
 		if (mMap != null) {
 			try {
 				recs = json.getJSONArray("records");
 				for (int i = 0; i < recs.length(); i++) {
 					user = recs.getJSONObject(i);
-					m = new MarkerOptions()
-							.position(new LatLng(user.getDouble("lat"), user.getDouble("lon")))
-							.title(user.getString("firstname") + " " + user.getString("lastname"));
-					if (null != user.getString("pic") && !"".equalsIgnoreCase(user.getString("pic"))) {
-						//bmp  = Ion.with((Context)activity).load(user.getString("pic")).asBitmap().get();
+					id = user.getString("id");
+					if(markers.containsKey(id)){
+						markers.get(id).setPosition(new LatLng(user.getDouble("latitude"), user.getDouble("longitude")));
+					}else {
+						m = new MarkerOptions()
+								.position(new LatLng(user.getDouble("latitude"), user.getDouble("longitude")))
+								.title(user.getString("name"));
+						if (null != user.getString("pic") && !"".equalsIgnoreCase(user.getString("pic"))) {
+							bmp = Ion.with((Context) activity).load(user.getString("pic")).asBitmap().get();
 
-						//m.icon(BitmapDescriptorFactory.fromBitmap(bmp));
+
+							m.icon(BitmapDescriptorFactory.fromBitmap(mergeToPin(bmp)));
+						}
+						markers.put(id, mMap.addMarker(m));
 					}
-					mMap.addMarker(m);
 				}
 
 			} catch (Exception e) {
@@ -284,8 +337,8 @@ public class LocationFragment extends Fragment implements LocationListener {
 	}
 
 	private void callAPI(){
-		SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
-		if((null == sharedPref.getString("nbkid",null) || null == sharedPref.getString("timeIn",null))){
+		SharedPreferences sharedPref = activity.getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
+		if((null == sharedPref.getString("id",null) || null == sharedPref.getString("timeIn",null))){
 			return;
 		}
 		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("timeIn",null).replace(":","")+"/routeId";
