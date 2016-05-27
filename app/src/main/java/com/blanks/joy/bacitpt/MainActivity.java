@@ -1,6 +1,7 @@
 package com.blanks.joy.bacitpt;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
@@ -8,29 +9,28 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
 import com.blanks.joy.bacitpt.fragments.CancelFragment;
 import com.blanks.joy.bacitpt.fragments.ComingSoonFragment;
 import com.blanks.joy.bacitpt.fragments.LocationFragment;
@@ -48,7 +48,7 @@ import com.koushikdutta.ion.Ion;
 
 import java.util.List;
 
-import de.hdodenhof.circleimageview.CircleImageView;
+
 
 public class MainActivity extends AppCompatActivity
 		implements
@@ -163,23 +163,8 @@ public class MainActivity extends AppCompatActivity
 					}
 				}
 
-				if (ContextCompat.checkSelfPermission(activity, Manifest.permission.SEND_SMS) != PackageManager.PERMISSION_GRANTED) {
-					/*
-					View.OnClickListener myOnClickListener = new View.OnClickListener() {
-						@Override
-						public void onClick(View view) {
-							ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS);
-						}
-					};
-					if (ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.SEND_SMS)) {
-						//Explain to the user why we need to read the contacts
-						Snackbar.make(view, "App requires permission to SEND SMS", Snackbar.LENGTH_INDEFINITE)
-								.setAction("OK", myOnClickListener).show();
-						return;
-					}else{
-						ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS);
-					}*/
-					ActivityCompat.requestPermissions(activity,new String[]{Manifest.permission.SEND_SMS},MY_PERMISSIONS);
+				if (!isRequestRequired()) {
+					return;
 				}else{
 
 					Message.sendMessage(screen,rosterType, time, date);
@@ -205,31 +190,13 @@ public class MainActivity extends AppCompatActivity
 		fragmentTransaction.commit();
 
 		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-		RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-		/*
-		TODO Find a better way
-		String url = Constants.URL_PREFIX+"/profile/"+sharedPref.getString("photoUrl","pic")+"/"+sharedPref.getString("id","")+"";
-
-		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-			@Override
-			public void onResponse(JSONObject response) {
-
-			}
-		}, new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-
-			}
-		});
-		queue.add(jsObjRequest);
-		*/
 
 		try{
-			CircleImageView civ = ((CircleImageView)findViewById(R.id.userView));
+			ImageView civ = ((ImageView)navigationView.findViewById(R.id.userView));
 			civ.setVisibility(View.VISIBLE);
-			civ.setImageDrawable(new BitmapDrawable(Ion.with((Context)activity).load(sharedPref.getString("photoUrl","")).asBitmap().get()));
+			civ.setImageDrawable(new BitmapDrawable(Ion.with((Context)activity).load(sharedPref.getString("pic","")).asBitmap().get()));
 		}catch (Exception e){
-
+			Log.e("bacitpt","some shit happened with your display pic");
 		}
 	}
 
@@ -340,12 +307,36 @@ public class MainActivity extends AppCompatActivity
 		return true;
 	}
 
+	private boolean isRequestRequired() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			return true;
+		}
+		if (checkSelfPermission(Manifest.permission.SEND_SMS) == PackageManager.PERMISSION_GRANTED) {
+			return true;
+		}
+		if (shouldShowRequestPermissionRationale(Manifest.permission.SEND_SMS)) {
+			Snackbar.make(findViewById(R.id.fab), "Please allow required access", Snackbar.LENGTH_INDEFINITE)
+					.setAction(android.R.string.ok, new View.OnClickListener() {
+						@Override
+						@TargetApi(Build.VERSION_CODES.M)
+						public void onClick(View v) {
+							requestPermissions(new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS);
+						}
+					}).show();
+		} else {
+			requestPermissions(new String[]{Manifest.permission.SEND_SMS}, MY_PERMISSIONS);
+		}
+		return false;
+	}
+
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		//super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		List<Fragment> fragments = getSupportFragmentManager().getFragments();
 		if (fragments != null) {
 			for (Fragment fragment : fragments) {
-				fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+				if(fragment!=null && fragment instanceof LocationFragment)
+					((LocationFragment)fragment).OnRequestPermissionsResultL(requestCode, permissions, grantResults);
 			}
 		}
 		switch (requestCode) {

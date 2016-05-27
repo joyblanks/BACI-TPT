@@ -2,6 +2,7 @@ package com.blanks.joy.bacitpt.fragments;
 
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,7 +11,9 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -47,7 +50,7 @@ import org.json.JSONObject;
  * A simple {@link Fragment} subclass.
  */
 public class LocationFragment extends Fragment implements LocationListener {
-	private static final int MY_PERMISSIONS = 123;
+	private static final int MY_LOC_PERMISSIONS = 123;
 	private static GoogleMap mMap;
 	private LocationManager locationManager;
 	private static Double latitude, longitude;
@@ -67,8 +70,8 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	@Override
 	public void onAttach(Context context) {
-		myContext=(FragmentActivity) context;
-		activity = (Activity)context;
+		myContext = (FragmentActivity) context;
+		activity = (Activity) context;
 		super.onAttach(context);
 		queue = Volley.newRequestQueue(context);
 	}
@@ -102,9 +105,10 @@ public class LocationFragment extends Fragment implements LocationListener {
 	private void setUpMap() {
 		// For showing a move to my loction button
 		if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-				|| ContextCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION)!= PackageManager.PERMISSION_GRANTED) {
-			ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_PERMISSIONS);
-		}else if(mMap != null){
+				|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_LOC_PERMISSIONS);
+			ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+		} else if (mMap != null) {
 			mMap.setMyLocationEnabled(true);
 			mMap.getUiSettings().setAllGesturesEnabled(true);
 			mMap.getUiSettings().setCompassEnabled(true);
@@ -123,10 +127,9 @@ public class LocationFragment extends Fragment implements LocationListener {
 	}
 
 
-
-	public void OnRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+	public void OnRequestPermissionsResultL(int requestCode, String permissions[], int[] grantResults) {
 		switch (requestCode) {
-			case MY_PERMISSIONS: {
+			case MY_LOC_PERMISSIONS: {
 				// If request is cancelled, the result arrays are empty.
 				if (grantResults.length > 0
 						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -146,10 +149,12 @@ public class LocationFragment extends Fragment implements LocationListener {
 		}
 	}
 
+
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 		switch (requestCode) {
-			case MY_PERMISSIONS: {
+			case MY_LOC_PERMISSIONS: {
 				// If request is cancelled, the result arrays are empty.
 				if (grantResults.length > 0
 						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -159,7 +164,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 					// permission denied, boo! Disable the
 					// functionality that depends on this permission.
-					super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
 				}
 				return;
 			}
@@ -171,20 +176,48 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		if(mMap!=null) {
+		if (mMap != null) {
 			LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 			broadcastLocation(location);
 			CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 12.0f);
 			mMap.animateCamera(cameraUpdate);
+
 			if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 					|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS);
-			} else
+				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_LOC_PERMISSIONS);
+				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+			}else {
 				locationManager.removeUpdates(this);
+			}
 		}
 
 			callAPI();
 
+	}
+
+
+	private boolean isRequestRequired() {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+			return true;
+		}
+		if (ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+				|| ActivityCompat.checkSelfPermission(getActivity(),Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+			return true;
+		}
+		if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)
+				||shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+			Snackbar.make(activity.findViewById(R.id.fab), "Please allow required access", Snackbar.LENGTH_INDEFINITE)
+					.setAction(android.R.string.ok, new View.OnClickListener() {
+						@Override
+						@TargetApi(Build.VERSION_CODES.M)
+						public void onClick(View v) {
+							ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+						}
+					}).show();
+		} else {
+			ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+		}
+		return false;
 	}
 
 	@Override
@@ -204,15 +237,10 @@ public class LocationFragment extends Fragment implements LocationListener {
 		String url = Constants.URL_PREFIX+"/"+sharedPref.getString("nbkid",null)+"/"+location.getLatitude()+","+location.getLongitude()+"/"+sharedPref.getString("timeIn",null).replace(":","")+"";
 		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 			@Override
-			public void onResponse(JSONObject response) {
-				// TODO Auto-generated method stub
-				//response.toString();
-			}
+			public void onResponse(JSONObject response) {}
 		}, new Response.ErrorListener() {
 			@Override
-			public void onErrorResponse(VolleyError error) {
-				// TODO Auto-generated method stub
-			}
+			public void onErrorResponse(VolleyError error) {}
 		});
 		queue.add(jsObjRequest);
 	}
@@ -264,13 +292,12 @@ public class LocationFragment extends Fragment implements LocationListener {
 		JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				// TODO Auto-generated method stub
 				populateTravellers(response);//.toString();
 			}
 		}, new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				// TODO Auto-generated method stub
+
 			}
 		});
 		queue.add(jsObjRequest);

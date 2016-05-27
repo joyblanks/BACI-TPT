@@ -5,13 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.blanks.joy.bacitpt.MainActivity;
 import com.blanks.joy.bacitpt.R;
+import com.blanks.joy.bacitpt.utils.Constants;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -23,24 +31,28 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
  * profile.
  */
 public class SignInActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener,
+        GoogleApiClient.OnConnectionFailedListener, GoogleApiClient.ConnectionCallbacks,
         View.OnClickListener {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
-    private GoogleApiClient mGoogleApiClient;
+    private static GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+
+	    super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         // Views
@@ -64,6 +76,7 @@ public class SignInActivity extends AppCompatActivity implements
         // options specified by gso.
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this /* FragmentActivity */, this /* OnConnectionFailedListener */)
+		        .addConnectionCallbacks(this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
         // [END build_client]
@@ -110,6 +123,8 @@ public class SignInActivity extends AppCompatActivity implements
         }
     }
 
+
+
     // [START onActivityResult]
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -125,35 +140,64 @@ public class SignInActivity extends AppCompatActivity implements
 
     // [START handleSignInResult]
     private void handleSignInResult(GoogleSignInResult result) {
-	    //intercept
-	    Intent iLogout = getIntent();
-	    boolean logIn = iLogout.getBooleanExtra("status", true);
-	    if(!logIn){
-		    signOut();
-	    }
+
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
             mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
             updateUI(true);
-	        Intent intent = new Intent(this, MainActivity.class);
-	        intent.putExtra("displayName", acct.getDisplayName());
-	        intent.putExtra("photoUrl", acct.getPhotoUrl());
-	        intent.putExtra("id", acct.getId());
-	        intent.putExtra("tokenId", acct.getIdToken());
-	        intent.putExtra("email", acct.getEmail());
+	        //intercept
+	        Intent iLogout = getIntent();
+	        boolean toLogIn = iLogout.getBooleanExtra("status", true);
+	        if(toLogIn){
+		        final Intent intent = new Intent(this, MainActivity.class);
 
-	        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-	        SharedPreferences.Editor editor = sharedPref.edit();
+		        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+		        SharedPreferences.Editor editor = sharedPref.edit();
 
-	        editor.putString("displayName", acct.getDisplayName());
-	        editor.putString("photoUrl", acct.getPhotoUrl().toString());
-	        editor.putString("id", acct.getId());
-	        editor.putString("tokenId", acct.getIdToken());
-	        editor.putString("email", acct.getEmail());
-	        editor.commit();
-	        startActivity(intent);
+		        editor.putString("name", acct.getDisplayName());
+		        editor.putString("pic", acct.getPhotoUrl().toString());
+		        editor.putString("id", acct.getId());
+		        editor.putString("tokenId", acct.getIdToken());
+		        editor.putString("email", acct.getEmail());
+		        editor.commit();
+
+		        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+		        String url = Constants.URL_PREFIX+"/signin/"+acct.getId();
+
+				JSONObject obj = new JSONObject();
+
+		        try {
+			        obj.put("name", acct.getDisplayName());
+			        obj.put("email", acct.getEmail());
+			        obj.put("pic", acct.getPhotoUrl().toString());
+
+		        } catch (JSONException e) {}
+		        JsonObjectRequest jsObjRequest = new JsonObjectRequest(Request.Method.POST, url, obj, new Response.Listener<JSONObject>() {
+			        @Override
+			        public void onResponse(JSONObject response) {
+				        try {
+					        if(response.getString("id").equalsIgnoreCase("false")){
+						        //new Intent(getApplicationContext(),SignInActivity.class);
+						        Snackbar.make(findViewById(R.id.sign_in_button),"Something went wrong",Snackbar.LENGTH_LONG).show();
+						        return;
+					        };
+				        } catch (JSONException e) {
+					        Snackbar.make(findViewById(R.id.sign_in_button),"Something went wrong",Snackbar.LENGTH_LONG).show();
+					        return;
+				        }
+				        startActivity(intent);
+			        }
+		        }, new Response.ErrorListener() {
+			        @Override
+			        public void onErrorResponse(VolleyError error) {}
+		        });
+		        queue.add(jsObjRequest);
+
+
+	        }
+
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);
@@ -170,6 +214,7 @@ public class SignInActivity extends AppCompatActivity implements
 
     // [START signOut]
     private void signOut() {
+
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
@@ -181,6 +226,7 @@ public class SignInActivity extends AppCompatActivity implements
                 });
     }
     // [END signOut]
+
 
     // [START revokeAccess]
     private void revokeAccess() {
@@ -245,4 +291,22 @@ public class SignInActivity extends AppCompatActivity implements
                 break;
         }
     }
+
+	@Override
+	public void onConnected(Bundle bundle) {
+		//intercept
+		Intent iLogout = getIntent();
+		boolean logIn = iLogout.getBooleanExtra("status", true);
+		iLogout.removeExtra("status");
+
+		if(!logIn){
+			signOut();
+			return;
+		}
+	}
+
+	@Override
+	public void onConnectionSuspended(int i) {
+
+	}
 }

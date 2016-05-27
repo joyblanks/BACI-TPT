@@ -12,8 +12,8 @@ import java.util.Calendar;
  */
 public class Message {
 	public static String getNumber(){
-		//return "+919769949082";//Joy
-		return "+919223172361";//BACI SMS Transport
+		return "+919769949082";//Joy
+		//return "+919223172361";//BACI SMS Transport
 	}
 
 	public static String getContent(int screen, String type, String time, String date){
