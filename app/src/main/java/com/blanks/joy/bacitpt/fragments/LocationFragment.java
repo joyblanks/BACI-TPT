@@ -118,50 +118,28 @@ public class LocationFragment extends Fragment implements LocationListener {
 
 	private void setUpMap() {
 		// For showing a move to my loction button
-		if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-				|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+		if (Build.VERSION.SDK_INT == Build.VERSION_CODES.M && (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+				|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)) {
 			requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_LOC_PERMISSIONS);
-			ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
 		} else if (mMap != null) {
-			mMap.setMyLocationEnabled(true);
-			mMap.getUiSettings().setAllGesturesEnabled(true);
-			mMap.getUiSettings().setCompassEnabled(true);
+				mMap.setMyLocationEnabled(true);
+				mMap.getUiSettings().setAllGesturesEnabled(true);
+				mMap.getUiSettings().setCompassEnabled(true);
 
-			mMap.getUiSettings().setMyLocationButtonEnabled(true);
-			mMap.getUiSettings().setTiltGesturesEnabled(true);
+				mMap.getUiSettings().setMyLocationButtonEnabled(true);
+				mMap.getUiSettings().setTiltGesturesEnabled(true);
 
-			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
-			// For dropping a marker at a point on the Map
-			MarkerOptions m = new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America").icon(BitmapDescriptorFactory.fromResource(R.mipmap.baci_marker));
-			mMap.addMarker(m);//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
-			// For zooming automatically to the Dropped PIN Location
-			//mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
-		}
-	}
-
-
-	public void OnRequestPermissionsResultL(int requestCode, String permissions[], int[] grantResults) {
-		switch (requestCode) {
-			case MY_LOC_PERMISSIONS: {
-				// If request is cancelled, the result arrays are empty.
-				if (grantResults.length > 0
-						&& grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-					setUpMap();
-				} else {
-
-					// permission denied, boo! Disable the
-					// functionality that depends on this permission.
-					super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-				}
-				return;
+				locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, this); //You can also use LocationManager.GPS_PROVIDER and LocationManager.PASSIVE_PROVIDER
+				// For dropping a marker at a point on the Map
+				MarkerOptions m = new MarkerOptions().position(new LatLng(latitude, longitude)).title("BACI Prism Mindspace Mumbai INDIA").snippet("Bank of America").icon(BitmapDescriptorFactory.fromResource(R.mipmap.map_mark_baci));;
+											//.icon(BitmapDescriptorFactory.fromBitmap(mergeToPin(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher))));
+				mMap.addMarker(m);//.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_logo))
+				// For zooming automatically to the Dropped PIN Location
+				//mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude,longitude), 12.0f));
 			}
-
-			// other 'case' lines to check for other
-			// permissions this app might request
-		}
 	}
+
 
 
 	@Override
@@ -199,7 +177,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 			if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
 					|| ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 				requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},MY_LOC_PERMISSIONS);
-				ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+
 			}else {
 				locationManager.removeUpdates(this);
 			}
@@ -210,7 +188,7 @@ public class LocationFragment extends Fragment implements LocationListener {
 	}
 
 
-	private boolean isRequestRequired() {
+	public boolean isRequestRequired() {
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			return true;
 		}
@@ -225,11 +203,11 @@ public class LocationFragment extends Fragment implements LocationListener {
 						@Override
 						@TargetApi(Build.VERSION_CODES.M)
 						public void onClick(View v) {
-							ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+							requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
 						}
 					}).show();
 		} else {
-			ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
+			requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.ACCESS_FINE_LOCATION}, MY_LOC_PERMISSIONS);
 		}
 		return false;
 	}

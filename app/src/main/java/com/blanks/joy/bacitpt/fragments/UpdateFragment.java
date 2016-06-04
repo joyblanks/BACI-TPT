@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.blanks.joy.bacitpt.R;
 import com.blanks.joy.bacitpt.interfaces.FragmentCommute;
+import com.blanks.joy.bacitpt.utils.Constants;
 import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
@@ -59,7 +60,7 @@ public class UpdateFragment extends Fragment implements TimePickerDialog.OnTimeS
 		} catch (ClassCastException e) {
 			throw new ClassCastException(context.toString() + " must implement FragmentCommute");
 		}
-		SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences sharedPref = getActivity().getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 		timeSlots[0] = sharedPref.getString("timeIn", null);
 		timeSlots[1] = sharedPref.getString("timeOut", null);
 	}

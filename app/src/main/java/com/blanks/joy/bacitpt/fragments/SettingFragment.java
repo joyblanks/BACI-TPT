@@ -58,7 +58,7 @@ public class SettingFragment extends Fragment{
 		Button timeOutButton = (Button)frag.findViewById(R.id.timeout_button);
 
 
-		SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+		SharedPreferences sharedPref = getActivity().getSharedPreferences(Constants.BACITPT,Context.MODE_PRIVATE);
 		timeInTextView.setText(sharedPref.getString("timeIn", null));
 		timeOutTextView.setText(sharedPref.getString("timeOut", null));
 

@@ -15,7 +15,6 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -46,8 +45,6 @@ import com.blanks.joy.bacitpt.utils.Constants;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.koushikdutta.ion.Ion;
-
-import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -335,8 +332,8 @@ public class MainActivity extends AppCompatActivity
 
 	@Override
 	public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-		//super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+		super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+		/*if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
 			List<Fragment> fragments = getSupportFragmentManager().getFragments();
 			if (fragments != null) {
 				for (Fragment fragment : fragments) {
@@ -344,7 +341,7 @@ public class MainActivity extends AppCompatActivity
 						((LocationFragment) fragment).OnRequestPermissionsResultL(requestCode, permissions, grantResults);
 				}
 			}
-		}
+		}*/
 		switch (requestCode) {
 			case MY_PERMISSIONS: {
 				// If request is cancelled, the result arrays are empty.

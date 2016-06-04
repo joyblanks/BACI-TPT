@@ -1,65 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.blanks.joy.bacitpt">
+    package="com.blanks.joy.bacitpt" >
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="21"/>
+        android:targetSdkVersion="21" />
 
-    <uses-permission android:name="android.permission.WRITE_SMS"/>
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
-
-    <meta-data
-        android:name="com.google.android.maps.v2.API_KEY"
-        android:value="AIzaSyC8G_0yiVUJDk6Ty8PH1fxDakMLhFVlqRI" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-
+        android:theme="@style/AppTheme" >
         <activity
-            android:name="com.blanks.joy.bacitpt.logon.SignInActivity"
+            android:name=".logon.SignInActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/ThemeOverlay.MyNoTitleActivity">
+            android:theme="@style/ThemeOverlay.MyNoTitleActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <!--<intent-filter>
+            android:theme="@style/AppTheme.NoActionBar" >
+
+            <!--
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>-->
+            </intent-filter>
+            -->
         </activity>
-        <receiver android:name=".operations.MessageReceiver" android:exported="true">
-        <intent-filter android:priority="999">
-            <action android:name="android.provider.Telephony.SMS_RECEIVED"></action>
-        </intent-filter>
+
+        <receiver
+            android:name=".operations.MessageReceiver"
+            android:exported="true" >
+            <intent-filter android:priority="999" >
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
         </receiver>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
@@ -67,19 +68,19 @@
              Note that the API key is linked to the encryption key used to sign the APK.
              You need a different API key for each encryption key, including the release key that is used to
              sign the APK for publishing.
-             You can define the keys for the debug and release targets in src/debug/ and src/release/. 
+             You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key"/>
+            android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
     </application>
 
-</manifest>
-
-<!--
+</manifest><!--
  +    Name: BACI_TPT_GMaps_Key
  +    Package Name: com.blanks.joy.bacitpt
  +    SHA-1 certificate fingerprint: 10:52:F4:2E:79:8A:26:E8:BC:9E:53:39:B6:41:81:A4:2C:E7:21:6F
-
 -->
